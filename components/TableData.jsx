@@ -2,16 +2,18 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
 
-function TableData({ data, setData }) {
+function TableData({ data, setData, setUserToEdit }) {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
-  const handleForm = () => {
+  const handleAdd = () => {
+    setUserToEdit(null); 
     navigate("/add-edit");
   };
 
   const handleEdit = (user) => {
-    navigate("/add-edit", { state: user });
+    setUserToEdit(user); 
+    navigate("/add-edit");
   };
 
   const handleDelete = (id) => {
@@ -21,8 +23,8 @@ function TableData({ data, setData }) {
   const handleSearch = data.filter(
     (user) =>
       user.name.toLowerCase().includes(search.toLowerCase()) ||
-      user.address.city.toLowerCase().includes(search.toLowerCase()) ||
-      user.company.name.toLowerCase().includes(search.toLowerCase())
+      user.address?.city.toLowerCase().includes(search.toLowerCase()) ||
+      user.company?.name.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -34,7 +36,7 @@ function TableData({ data, setData }) {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
-      <button onClick={handleForm}>Add new user</button>
+      <button onClick={handleAdd}>Add new user</button>
       <table border="1" cellPadding="10">
         <thead>
           <tr>
