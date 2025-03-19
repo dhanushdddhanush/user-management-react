@@ -1,0 +1,26 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+table,tr,td,th{
+  
+  border-collapse: collapse;
+
+}
+input{
+  display: flex;
+  padding: 10px;
+  border-radius: 5px;
+  align-items: center;
+ margin-bottom: 5px;
+}
