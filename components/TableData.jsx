@@ -1,71 +1,77 @@
-import { useState } from "react";
+import React from 'react';
+import { useEffect , useState} from 'react';
 import { useNavigate } from "react-router-dom";
-import "../App.css";
-
-function TableData({ data, setData, setUserToEdit }) {
-  const [search, setSearch] = useState("");
-  const navigate = useNavigate();
-
-  const handleAdd = () => {
-    setUserToEdit(null); 
-    navigate("/add-edit");
+import axios from "axios";
+function TableData() {
+const [expenses, setExpenses] = useState([]);
+const[search, setSearch]=useState('');
+useEffect(()=>{
+    fetch('http://localhost:8080/users')
+    .then((response) => response.json())
+    .then((data) => setExpenses(data));
+},[]);
+const navigate = useNavigate();
+useEffect(() => {
+    localStorage.setItem('expenses', JSON.stringify(expenses));
+  }, [expenses]);
+  
+  const handleRoles = () => {
+   
+    navigate("/roles");
   };
-
-  const handleEdit = (user) => {
-    setUserToEdit(user); 
-    navigate("/add-edit");
-  };
-
-  const handleDelete = (id) => {
-    setData(data.filter((user) => user.id !== id));
-  };
-
-  const handleSearch = data.filter(
-    (user) =>
-      user.name.toLowerCase().includes(search.toLowerCase()) ||
-      user.address?.city.toLowerCase().includes(search.toLowerCase()) ||
-      user.company?.name.toLowerCase().includes(search.toLowerCase())
+  const handleSearch = expenses.filter(
+    (expense) =>
+        expense.email.toLowerCase().includes(search.toLowerCase()) ||
+    expense.username.toLowerCase().includes(search.toLowerCase()) 
   );
+
+
+const handleDelete = async (id) => {
+  const confirmDelete = window.confirm("Are you sure you want to delete this user?");
+  if (!confirmDelete) return;
+
+  try {
+    await axios.delete(`http://localhost:8080/users/user/delete/${id}`);
+    alert("User deleted successfully!");
+    setExpenses(expenses.filter((expense) => expense.id !== id)); 
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    alert("Failed to delete user.");
+  }
+};
 
   return (
-    <>
-      <h1>Users Data</h1>
-      <input
-        type="text"
-        placeholder="Search"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
-      <button onClick={handleAdd}>Add new user</button>
-      <table border="1" cellPadding="10">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Phone</th>
-            <th>City</th>
-            <th>Company</th>
-            <th>Edit/Delete</th>
-          </tr>
-        </thead>
-        <tbody>
-          {handleSearch.map((user) => (
-            <tr key={user.id}>
-              <td>{user.id}</td>
-              <td>{user.name}</td>
-              <td>{user.phone}</td>
-              <td>{user.address?.city}</td>
-              <td>{user.company?.name}</td>
-              <td>
-                <button onClick={() => handleEdit(user)}>Edit</button>{" "}
-                <button onClick={() => handleDelete(user.id)}>Delete</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </>
-  );
+   <>
+   <input type="search"  name="search" id="" onChange={(e)=>setSearch(e.target.value)} />
+   <button onClick={() => navigate("/add")}>Add new expense</button>
+   <button onClick={handleRoles}>Roles</button>
+<table >
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Date</th>
+            <th>Category</th>
+            <th>Amount</th>
+            
+<th>Modify</th>
+        </tr>
+    </thead>
+    <tbody>
+{
+    handleSearch.map((expense)=>(
+      <tr key={expense.id}>
+        <td>{expense.id}</td>
+        <td>{expense.username}</td>
+        <td>{expense.email}</td>
+        <td>{expense.password}</td>
+        <td><button onClick={() => navigate(`/edit/${expense.id}`)}>Edit</button> <button onClick={()=>handleDelete(expense.id)}>Delete</button></td>
+      </tr>
+    ))
+}
+</tbody>
+</table>
+   </> 
+   )
 }
 
 export default TableData;
